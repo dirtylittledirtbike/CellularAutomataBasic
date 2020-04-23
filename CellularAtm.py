@@ -12,9 +12,9 @@ class Cell(object):
 
 
 ca = Cell
-width = 500  # doing this for inclusivity
-height = 500  # doing this for inclusivity
-scl = 5
+width = 600
+height = 600
+scl = 4
 
 image1 = Image.new("RGB", (width, height), (255, 255, 255))
 draw = ImageDraw.Draw(image1)
@@ -48,19 +48,17 @@ def start_state(w, h, s, state):
         print('wrong dimensions')
 
 
-def initialize():
-    ca.current_state = start_state(width, height, scl, 'rand')
-    ca.next_state = np.zeros((int(width / scl), int(height / scl)))
-    ca.neighbors = 0
 
-
-initialize()
+ca.current_state = start_state(width, height, scl, 'cross')
+ca.next_state = np.zeros((int(width / scl), int(height / scl)))
+ca.neighbors = 0
 
 
 def update():
     for i in range(0, width, scl):
         for j in range(0, height, scl):
-
+            
+            # wrap edges around corresponding axis
             i_minus = int(i / scl) - 1
             if i_minus < 0:
                 i_minus = int(width / scl) - 1
@@ -94,18 +92,18 @@ def update():
             # elif ca.current_state[int(i / scl)][int(j / scl)] == 0 and (ca.neighbors == 1 or ca.neighbors == 3 or ca.neighbors == 8):
             #     ca.next_state[int(i / scl)][int(j / scl)] = 1
 
-#            if ca.current_state[int(i/scl)][int(j/scl)] == 1 and (ca.neighbors == 1 or ca.neighbors == 6 or ca.neighbors == 2):
-#                ca.next_state[int(i/scl)][int(j/scl)] = 0
-#            elif ca.current_state[int(i/scl)][int(j/scl)] == 0 and (ca.neighbors < 3 or ca.neighbors == 7):
-#                ca.next_state[int(i/scl)][int(j/scl)] = 1
+            if ca.current_state[int(i/scl)][int(j/scl)] == 1 and (ca.neighbors == 1 or ca.neighbors == 6 or ca.neighbors == 2):
+                ca.next_state[int(i/scl)][int(j/scl)] = 0
+            elif ca.current_state[int(i/scl)][int(j/scl)] == 0 and (ca.neighbors < 3 or ca.neighbors == 7):
+                ca.next_state[int(i/scl)][int(j/scl)] = 1
 
             # game of life
-            if ca.current_state[int(i/scl)][int(j/scl)] == 1 and (ca.neighbors < 2 or ca.neighbors == 1):
-                ca.next_state[int(i/scl)][int(j/scl)] = 0
-            elif ca.current_state[int(i/scl)][int(j/scl)] == 1 and (ca.neighbors > 3):
-                ca.next_state[int(i/scl)][int(j/scl)] = 0
-            elif ca.current_state[int(i/scl)][int(j/scl)] == 0 and (ca.neighbors == 3):
-                ca.next_state[int(i/scl)][int(j/scl)] = 1
+#            if ca.current_state[int(i/scl)][int(j/scl)] == 1 and (ca.neighbors < 2 or ca.neighbors == 1):
+#                ca.next_state[int(i/scl)][int(j/scl)] = 0
+#            elif ca.current_state[int(i/scl)][int(j/scl)] == 1 and (ca.neighbors > 3):
+#                ca.next_state[int(i/scl)][int(j/scl)] = 0
+#            elif ca.current_state[int(i/scl)][int(j/scl)] == 0 and (ca.neighbors == 3):
+#                ca.next_state[int(i/scl)][int(j/scl)] = 1
 
             if ca.current_state[int(i / scl)][int(j / scl)] == 1:
                 canvas.create_rectangle(i, j, i + scl, j + scl, fill='orange', outline='')
@@ -117,7 +115,7 @@ def update():
             ca.current_state[int(i / scl)][int(j / scl)] = ca.next_state[int(i / scl)][int(j / scl)]
 
     # keyboard.wait("p")
-    my_window.after(200, update)
+    my_window.after(400, update)
     filename = "my_CA.jpg"
     image1.save(filename)
 
@@ -126,5 +124,5 @@ my_window = Tk()
 canvas = Canvas(my_window, width=width, height=height, background='black')
 canvas.pack()
 
-my_window.after(200, update)
+my_window.after(400, update)
 my_window.mainloop()
