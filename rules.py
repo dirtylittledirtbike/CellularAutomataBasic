@@ -6,8 +6,18 @@ def pad_with(vector, pad_width, iaxis, kwargs):
     vector[-pad_width[1]:] = pad_value
 
 
-def start_state(w, h, s, state):
+def pad_with(vector, pad_width, iaxis, kwargs):
+    pad_value = kwargs.get('padder', 10)
+    vector[:pad_width[0]] = pad_value
+    vector[-pad_width[1]:] = pad_value
 
+
+def start_state(w, h, s, state):
+    
+    if state == 'border':
+        border = np.zeros((w, h), dtype=int)
+        border[1:-1, 1:-1] = 1
+        return border
     if state == 'pad' and int(w/s) % 3 == 0:
         x = int((w/s)/3)
         y = int(((w/s) - x)/2)
@@ -15,16 +25,16 @@ def start_state(w, h, s, state):
         cd = np.pad(ab, int(y/2), pad_with, padder=1)
         ef = np.pad(cd, int(y/2), pad_with, padder = 0)
         return ef
-
+    
     elif state == 'cross':
         aa = np.eye(int(w/s), dtype=int)
         bb = np.rot90(aa).copy()
         cc = np.array(aa + bb)
         return cc
-
+    
     elif state == 'rand':
         return np.random.randint(0, 2, (int(w/s), int(h/s)))
-
+    
     else:
         print('wrong dimensions')
 
