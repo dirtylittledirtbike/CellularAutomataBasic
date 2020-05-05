@@ -1,102 +1,78 @@
 from tkinter import *
-import numpy as np
 from PIL import Image, ImageDraw
-from rules import start_state
+from cells import ca, initialize
 
-
-class Cells(object):
-    def __init__(self):
-        self.current_state = []
-        self.neighbors = 0
-        self.next_state = []
-
-
-ca = Cells
-width = 500
-height = 500
+win_width = 500
+win_height = 500
 scl = 5
+cells_width = int(win_width/scl)
+cells_height = int(win_height/scl)
+print(cells_height)
 
-image1 = Image.new("RGB", (width, height), (255, 255, 255))
+image1 = Image.new("RGB", (win_width, win_height), (255, 255, 255))
 draw = ImageDraw.Draw(image1)
-
-ca.current_state = start_state(width, height, scl, 'cross')
-print(ca.current_state)
-# ca.next_state = np.zeros((int(width / scl), int(height / scl)))
-ca.neighbors = 0
+cells_arr = initialize(cells_width, cells_height, 'diag')
 
 
 def update():
 
-    ca.next_state = np.zeros((int(width / scl), int(height / scl)))
-    for i in range(0, width, scl):
-        for j in range(0, height, scl):
-            # ca.neighbors =
-            # wrap edges around corresponding axis
-            i_minus = int(i / scl) - 1
-            if i_minus < 0:
-                i_minus = int(width / scl) - 1
+    # update cells
+    for i in range(cells_width):
+        for j in range(cells_height):
 
-            i_plus = int(i / scl) + 1
-            if i_plus > int(width / scl) - 1:
+            i_minus = i - 1
+            if i_minus < 0:
+                i_minus = cells_width - 1
+
+            i_plus = i + 1
+            if i_plus > cells_width - 1:
                 i_plus = 0
 
-            j_minus = int(j / scl) - 1
+            j_minus = j - 1
             if j_minus < 0:
-                j_minus = int(height / scl) - 1
+                j_minus = cells_height - 1
 
-            j_plus = int(j / scl) + 1
-            if j_plus == int(height / scl):
+            j_plus = j + 1
+            if j_plus > cells_height - 1:
                 j_plus = 0
 
-            topLeft = ca.current_state[i_minus][j_minus]
-            origin = ca.current_state[int(i/scl)][int(j/scl)]
-            topCenter = ca.current_state[int(i / scl)][j_minus]
-            topRight = ca.current_state[i_plus][j_minus]
-            midLeft = ca.current_state[i_minus][int(j / scl)]
-            midRight = ca.current_state[i_plus][int(j / scl)]
-            bottomLeft = ca.current_state[i_minus][j_plus]
-            bottomCenter = ca.current_state[int(i / scl)][j_plus]
-            bottomRight = ca.current_state[i_plus][j_plus]
+            topLeft = cells_arr[i_minus][j_minus].current_state
+            topCenter = cells_arr[i][j_minus].current_state
+            topRight = cells_arr[i_plus][j_minus].current_state
+            midLeft = cells_arr[i_minus][j].current_state
+            midRight = cells_arr[i_plus][j].current_state
+            bottomLeft = cells_arr[i_minus][j_plus].current_state
+            bottomCenter = cells_arr[i][j_plus].current_state
+            bottomRight = cells_arr[i_plus][j_plus].current_state
 
-            ca.neighbors = int(topLeft + topCenter + topRight + midLeft \
-                           + midRight + bottomLeft + bottomCenter + bottomRight)
-     
-            # dope quilt plaid pattern start with cross
-            if ca.current_state[int(i/scl)][int(j/scl)] == 1 and (ca.neighbors == 1 or ca.neighbors == 2 or ca.neighbors == 5):
-                ca.next_state[int(i/scl)][int(j/scl)] = 1
-            elif ca.current_state[int(i/scl)][int(j/scl)] == 0 and (ca.neighbors == 2 or ca.neighbors == 6):
-                ca.next_state[int(i/scl)][int(j/scl)] = 1
-#            else:
-#                ca.next_state[int(i/scl)][int(j/scl)] = ca.current_state[int(i/scl)][int(j/scl)]
+            sum = int(topLeft + topCenter + topRight + midLeft \
+                      + midRight + bottomLeft + bottomCenter + bottomRight)
 
-            # game of life good stuff with cross or random
-            # if ca.current_state[int(i/scl)][int(j/scl)] == 0 and ca.neighbors == 3:
-            #     ca.next_state[int(i/scl)][int(j/scl)] = 1
-            # elif ca.current_state[int(i/scl)][int(j/scl)] == 1 and (ca.neighbors < 2 or ca.neighbors > 3):
-            #     ca.next_state[int(i/scl)][int(j/scl)] = 0
-            # else:
-            #     ca.next_state[int(i/scl)][int(j/scl)] = ca.current_state[int(i/scl)][int(j/scl)]
+            cells_arr[i][j].neighbors = sum
+            # pick a rule from the cells class
+            ca.maze(cells_arr[i][j])
 
+    # draw frames canvas cuts it off so starting at 2
+    for i in range(0, win_width, scl):
+        for j in range(0, win_height, scl):
 
-            if ca.current_state[int(i / scl)][int(j / scl)] == 1:
-                canvas.create_rectangle(i, j, i + scl, j + scl, fill='red', outline='')
-                draw.rectangle((i, j, i + scl, j + scl), fill=(153,0,17), outline=None)
+            if cells_arr[int(i / scl)][int(j / scl)].current_state == 1:
+                canvas.create_rectangle(i, j, i + scl, j + scl, fill='orange', outline='')
+                draw.rectangle((i, j, i + scl, j + scl), fill='orange', outline=None)
             else:
-                canvas.create_rectangle(i, j, i + scl, j + scl, fill='white', outline='')
-                draw.rectangle((i, j, i + scl, j + scl), fill=(252, 246, 245), outline=None)
+                canvas.create_rectangle(i, j, i + scl, j + scl, fill='blue', outline='')
+                draw.rectangle((i, j, i + scl, j + scl), fill='blue', outline=None)
 
-    # keyboard.wait("p")
+            cells_arr[int(i/scl)][int(j/scl)].current_state = cells_arr[int(i/scl)][int(j/scl)].next_state
 
-    my_window.after(100, update)
+    my_window.after(40, update)
     filename = "my_CA.jpg"
     image1.save(filename)
-    ca.current_state = ca.next_state
 
 
 my_window = Tk()
-canvas = Canvas(my_window, width=width, height=height, background='black')
+canvas = Canvas(my_window, width=win_width, height=win_height, background='black')
 canvas.pack()
 
-# update()
-my_window.after(100, update)
+my_window.after(40, update)
 my_window.mainloop()
