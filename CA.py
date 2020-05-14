@@ -6,10 +6,11 @@ import numpy as np
 
 cells_width = 100
 cells_height = 100
-cells_arr = initialize(cells_width, cells_height, 'diag')
+# initialize cells array with a starting state/initial matrix
+# arguments include diag, border, cross, rand
+cells_arr = initialize(cells_width, cells_height, 'cross')
 
 
-# @profile
 def update_cells():
 
     # update cells
@@ -54,6 +55,7 @@ def update_cells():
             # matr[i][j] = cells_arr[i][j].current_state
 
     current_state_mat = [[cells_arr[i][j].current_state for i in range(cells_width)] for j in range(cells_height)]
+
     return current_state_mat
 
 
@@ -63,7 +65,6 @@ def animate(itr):
     ax.set_xticks([])
     ax.set_yticks([])
     ax.imshow(arr, cmap=cm.jet, interpolation='nearest')
-    # return mat
 
 
 fig, ax = plt.subplots()

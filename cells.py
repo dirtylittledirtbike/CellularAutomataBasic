@@ -122,8 +122,6 @@ def start_state(w, h, state):
         np.fill_diagonal(Z, 1)
         Z = np.rot90(Z)
         return Z
-    elif state == 'zeros':
-        return np.zeros((w, h))
     else:
         print('wrong dimensions')
 
