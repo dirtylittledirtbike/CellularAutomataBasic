@@ -4,8 +4,8 @@ import matplotlib.cm as cm
 from matplotlib.animation import FuncAnimation
 import numpy as np
 
-cells_width = 50
-cells_height = 50
+cells_width = 100
+cells_height = 100
 cells_arr = initialize(cells_width, cells_height, 'diag')
 
 
@@ -67,7 +67,7 @@ def animate(itr):
 
 
 fig, ax = plt.subplots()
-animation = FuncAnimation(fig, animate, 20)
+animation = FuncAnimation(fig, animate, 50)
 #plt.show()
 
 animation.save('./CA.gif', writer='PillowWriter')
