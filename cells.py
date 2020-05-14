@@ -32,6 +32,58 @@ class Cells(object):
         else:
             self.next_state = 0
 
+    def high_life(self):
+        if self.current_state == 1 and (self.neighbors == 2 or self.neighbors == 3):
+            self.next_state = 1
+        elif self.current_state == 0 and (self.neighbors == 3 or self.neighbors == 6):
+            self.next_state = 1
+        else:
+            self.next_state = 0
+
+    def spots(self):
+        if self.current_state == 1 and (self.neighbors == 2 or self.neighbors == 3):
+            self.next_state = 1
+        elif self.current_state == 0 and (self.neighbors == 1):
+            self.next_state = 1
+        else:
+            self.next_state = 0
+
+    def lsd(self):
+        if self.current_state == 1 and (self.neighbors == 1 or self.neighbors == 2 or self.neighbors == 5):
+            self.next_state = 1
+        elif self.current_state == 0 and (self.neighbors == 3 or self.neighbors == 6):
+            self.next_state = 1
+        else:
+            self.next_state = 0
+
+    def move(self):
+        if self.current_state == 1 and (5 >= self.neighbors >= 3):
+            self.next_state = 1
+        elif self.current_state == 0 and (self.neighbors == 3 or self.neighbors == 6 or self.neighbors == 8):
+            self.next_state = 1
+        else:
+            self.next_state = 0
+
+    def rand_choice(self):
+        if self.current_state == 1 and (self.neighbors < 3 or self.neighbors > 2):
+            self.next_state = 0
+        elif self.current_state == 0 and (self.neighbors != 2):
+            self.next_state = 0
+        else:
+            self.next_state = 1
+
+    def replicator(self):
+        if self.current_state == 1 and (self.neighbors == 1 or self.neighbors == 3 or self.neighbors == 5 or self.neighbors == 7):
+            self.next_state = 1
+        elif self.current_state == 0 and (self.neighbors == 1 or self.neighbors == 3 or self.neighbors == 5 or self.neighbors == 7):
+            self.next_state = 1
+        else:
+            self.next_state = 0
+
+    def update_states(self):
+        self.current_state = self.next_state
+        # return self
+
 
 ca = Cells
 
@@ -77,14 +129,37 @@ def start_state(w, h, state):
 
 
 def initialize(w, h, mat):
-    my_cells = []
-    # create an initial matrix of 1s and 0s
     initial_mat = start_state(w, h, state=mat)
-    print(initial_mat)
-    for i in range(w):
-        for j in range(h):
-            my_cells.append(ca(current_state=initial_mat[i, j], neighbors=0, next_state=0))
-
+    my_cells = [ca(current_state=initial_mat[i, j], neighbors=0, next_state=0)
+                for i in range(w) for j in range(h)]
     cells_arr = np.asarray(my_cells).reshape(w, h)
     return cells_arr
 
+#
+
+
+# import cProfile
+# import pstats
+# import time
+
+
+# def initial_setup():
+#     a = 7
+#     time.sleep(1)
+#     return a
+#
+#
+# def slow_function():
+#     x = range(5)
+#     a = 0
+#     for i in x:
+#         a *= i
+#         # a = initial_setup()
+#         # b = a + i
+#         # print(b)
+
+
+# profile = cProfile.Profile()
+# profile.runcall(slow_function)
+# ps = pstats.Stats(profile)
+# ps.print_stats()

@@ -1,20 +1,16 @@
-from tkinter import *
-from PIL import Image, ImageDraw
 from cells import ca, initialize
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+from matplotlib.animation import FuncAnimation
+import numpy as np
 
-win_width = 500
-win_height = 500
-scl = 5
-cells_width = int(win_width/scl)
-cells_height = int(win_height/scl)
-print(cells_height)
-
-image1 = Image.new("RGB", (win_width, win_height), (255, 255, 255))
-draw = ImageDraw.Draw(image1)
+cells_width = 50
+cells_height = 50
 cells_arr = initialize(cells_width, cells_height, 'diag')
 
 
-def update():
+# @profile
+def update_cells():
 
     # update cells
     for i in range(cells_width):
@@ -50,29 +46,28 @@ def update():
 
             cells_arr[i][j].neighbors = sum
             # pick a rule from the cells class
-            ca.maze(cells_arr[i][j])
+            ca.life(cells_arr[i][j])
 
-    # draw frames canvas cuts it off so starting at 2
-    for i in range(0, win_width, scl):
-        for j in range(0, win_height, scl):
+    for i in range(cells_width):
+        for j in range(cells_height):
+            cells_arr[i][j].update_states()
+            # matr[i][j] = cells_arr[i][j].current_state
 
-            if cells_arr[int(i / scl)][int(j / scl)].current_state == 1:
-                canvas.create_rectangle(i, j, i + scl, j + scl, fill='orange', outline='')
-                draw.rectangle((i, j, i + scl, j + scl), fill='orange', outline=None)
-            else:
-                canvas.create_rectangle(i, j, i + scl, j + scl, fill='blue', outline='')
-                draw.rectangle((i, j, i + scl, j + scl), fill='blue', outline=None)
-
-            cells_arr[int(i/scl)][int(j/scl)].current_state = cells_arr[int(i/scl)][int(j/scl)].next_state
-
-    my_window.after(40, update)
-    filename = "my_CA.jpg"
-    image1.save(filename)
+    current_state_mat = [[cells_arr[i][j].current_state for i in range(cells_width)] for j in range(cells_height)]
+    return current_state_mat
 
 
-my_window = Tk()
-canvas = Canvas(my_window, width=win_width, height=win_height, background='black')
-canvas.pack()
+def animate(itr):
+    ax.cla()
+    arr = update_cells()
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.imshow(arr, cmap=cm.jet, interpolation='nearest')
+    # return mat
 
-my_window.after(40, update)
-my_window.mainloop()
+
+fig, ax = plt.subplots()
+animation = FuncAnimation(fig, animate, 20)
+#plt.show()
+
+animation.save('./CA.gif', writer='PillowWriter')
